@@ -1,0 +1,95 @@
+﻿@page "/articlelist"
+@inject IArticleManager articleManager
+@inherits FetchArticleBase
+
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+<style>
+    .sort-th {
+        cursor: pointer;
+    }
+
+    .fa {
+        float: right;
+    }
+
+    .btn-custom {
+        color: black;
+        float: left;
+        padding: 8px 16px;
+        text-decoration: none;
+        transition: background-color .3s;
+        border: 2px solid #000;
+        margin: 0px 5px 0px 5px;
+    }
+</style>
+
+<div>
+    <a class="btn btn-primary" href='/addArticle'>Add</a>
+</div>
+<br />
+
+@if (articleModel == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row col-md-3 pull-right">
+        <input type="text" id="txtSearch" placeholder="Search Titles..." class="form-control" @bind="SearchTerm" @bind:event="oninput" />
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="sort-th" @onclick="@(() => SortTable("ID"))">
+                    ID
+                    <span class="fa @(SetSortIcon("ID"))"></span>
+                </th>
+                <th class="sort-th" @onclick="@(() => SortTable("Title"))">
+                    Title
+                    <span class="fa @(SetSortIcon("Title"))"></span>
+                </th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (articleModel == null || articleModel.Count == 0)
+            {
+                <tr>
+                    <td colspan="3">
+                        No Records to display
+                    </td>
+                </tr>
+            }
+            else
+            {
+                foreach (var article in articleModel)
+                {
+                    <tr>
+                        <td>@article.ID</td>
+                        <td>@article.Title</td>
+                        <td>
+                            <a class="btn btn-primary" href='/editArticle/@article.ID'>Edit</a>  |
+                            <a class="btn btn-danger" @onclick="() => DeleteArticle(article.ID)">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+    <div class="pagination">
+        <button class="btn btn-custom" @onclick=@(async ()=>await NavigateToPage("previous"))>Prev</button>
+
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            var currentPage = i;
+            <button class="btn btn-custom pagebutton @(currentPage==curPage?"btn-danger":"")" @onclick=@(async () =>await refreshRecords(currentPage))>
+                @currentPage
+            </button>
+        }
+
+        <button class="btn btn-custom" @onclick=@(async ()=>await NavigateToPage("next"))>Next</button>
+
+    </div>
+}
