@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using BlazorCRUD2.Contracts;
 using BlazorCRUD2.Concrete;
+using ElectronNET.API;
 
 namespace BlazorCRUD2
 {
@@ -58,6 +59,13 @@ namespace BlazorCRUD2
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
+            ElectronBootstrap();
+        }
+
+        void ElectronBootstrap()
+        {
+            Task.Run(async () => await Electron.WindowManager.CreateWindowAsync());
         }
     }
 }
